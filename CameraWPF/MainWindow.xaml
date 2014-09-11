@@ -1,0 +1,14 @@
+﻿<Window x:Class="CameraWPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:WebCam="clr-namespace:WebcamUserControl;assembly=WebcamUserControl"
+        Title="Overlay Transparent Image Onto Video Feed" Width="800" Height="700">
+    <Grid Background="SeaGreen">
+        <WebCam:VideoPortControl Name="WebcamCtrl"/>
+        <Grid Width="500">
+            <Button Content="Start Video" Height="24" Width="100" VerticalAlignment="Bottom" x:Name="StartVideoFeed" Click="StartVideoFeed_Click" Margin="20,0,380,5" />
+            <Button Content="Stop Video" Height="24" Width="100"  VerticalAlignment="Bottom" x:Name="StopVideoFeed" Click="StopVideoFeed_Click" Margin="133,0,267,5" />
+            <Button Content="Save" Height="24" Width="100" VerticalAlignment="Bottom" x:Name="SaveSnapshot" Click="SaveSnapshotButton_Click" Margin="369,0,31,5" />
+        </Grid>
+    </Grid>
+</Window>

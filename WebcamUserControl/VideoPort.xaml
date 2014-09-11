@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="WebcamUserControl.VideoPortControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"              
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"            
+             xmlns:aforge="clr-namespace:AForge.Controls;assembly=AForge.Controls"     
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <DataTemplate x:Key="DevicesListTemplate">
+            <TextBlock Text="{Binding Name}"/>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid Background="White" Width="700" Height="590">
+        <WindowsFormsHost Width="640" Height="480">
+            <aforge:VideoSourcePlayer x:Name="videoSourcePlayer"/>
+        </WindowsFormsHost>
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Bottom" RenderTransformOrigin="0.5,0.5">
+            <StackPanel.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="0.098"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </StackPanel.RenderTransform>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="22">
+                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top" Width="48"
+                           Text="Camera" TextAlignment="Left" FlowDirection="LeftToRight" Margin="0,12,0,-6" />
+                <ComboBox  HorizontalAlignment="Left" VerticalAlignment="Top"
+                	x:Name="VideoDevicesComboBox" ItemTemplate="{StaticResource DevicesListTemplate}" Margin="0,10,0,-10">
+                </ComboBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="23" Margin="0,10,0,0"/>
+        </StackPanel>
+    </Grid>
+</UserControl>
