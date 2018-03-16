@@ -1,18 +1,10 @@
-﻿using AForge.Video;
-using AForge.Video.DirectShow;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
-using WebcamUserControl;
+using Accord.Video;
+using Accord.Video.DirectShow;
 
 namespace WebcamUserControl
 {
@@ -31,28 +23,50 @@ namespace WebcamUserControl
         }
 
         public string OverlayImagePath { get; set; }
+        public int XCoordinate { get; set; }
+        public int YCoordinate { get; set; }
 
         /// <summary>
         /// Displays webcam video and asks for image to overlay
         /// </summary>
-        public void StartVideoFeed()
+        public void StartVideoFeed(string x, string y)
         {
-            var openFileDialog = new OpenFileDialog()
+            if (videoSourcePlayer.VideoSource == null)
             {
-                DefaultExt = "png",
-                Filter = "PNG Image | *.png",
-                Title = "Please select an image to overlay onto the video feed..."
-            };
+                AquireVideoSourceAndPlay(x, y);
+            }
+            else
+            {
+                videoSourcePlayer.VideoSource.SignalToStop();
+                videoSourcePlayer.VideoSource = null;
 
-            if (openFileDialog.ShowDialog() == true)
-                OverlayImagePath = openFileDialog.FileName;
+                AquireVideoSourceAndPlay(x, y);
+            }
+        }
+
+        private void AquireVideoSourceAndPlay(string x, string y)
+        {
+            if (OverlayImagePath == null)
+            {
+                var openFileDialog = new OpenFileDialog()
+                {
+                    DefaultExt = "png",
+                    Filter = "PNG Image | *.png",
+                    Title = "Please select a PNG image to overlay onto the video feed..."
+                };
+
+                if (openFileDialog.ShowDialog() == true)
+                    OverlayImagePath = openFileDialog.FileName;
+            }
 
             var device = (FilterInfo)VideoDevicesComboBox.SelectedItem;
             if (device != null)
             {
+                XCoordinate = Convert.ToInt32(x);
+                YCoordinate = Convert.ToInt32(y);
+
                 var source = new VideoCaptureDevice(device.MonikerString);
-                // register NewFrame event handler
-                source.NewFrame += new NewFrameEventHandler(video_NewFrame); 
+                source.NewFrame += new NewFrameEventHandler(video_NewFrame); // register NewFrame event handler
 
                 videoSourcePlayer.VideoSource = source;
                 videoSourcePlayer.Start();
@@ -81,7 +95,7 @@ namespace WebcamUserControl
                 };
 
                 if (saveFileDialog.ShowDialog() == true)
-                    bmp.Save(saveFileDialog.FileName, System.Drawing.Imaging.ImageFormat.Png);
+                    bmp.Save(saveFileDialog.FileName, ImageFormat.Png);
             }
         }
 
@@ -94,13 +108,13 @@ namespace WebcamUserControl
 
                 using (System.Drawing.Image backImage = (Bitmap)frame.Clone())
                 using (System.Drawing.Image frontImage = System.Drawing.Image.FromFile(OverlayImagePath))
-                using (System.Drawing.Image newImage = new Bitmap(backImage.Width, backImage.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb))
+                using (System.Drawing.Image newImage = new Bitmap(backImage.Width, backImage.Height, PixelFormat.Format32bppArgb))
                 {
                     using (Graphics compositeGraphics = Graphics.FromImage(newImage))
                     {
                         compositeGraphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceOver;
                         compositeGraphics.DrawImageUnscaled(backImage, 0, 0);
-                        compositeGraphics.DrawImageUnscaled(frontImage, 250, 350); // TODO: make positioning dynamic or configurable
+                        compositeGraphics.DrawImageUnscaled(frontImage, XCoordinate, YCoordinate);
                         compositeGraphics.Dispose();
                         frontImage.Dispose();
                         backImage.Dispose();
